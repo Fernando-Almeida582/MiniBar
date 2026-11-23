@@ -10,7 +10,7 @@ Um widget de mídia para Windows 10 e 11 com controles junto à barra de tarefas
 
 ## Baixar e executar
 
-1. Abra a [release mais recente](https://github.com/Fernando-Almeida582/MeuPlayer/releases/latest).
+1. Abra a [release mais recente](https://github.com/Fernando-Almeida582/MiniBar/releases/latest).
 2. Baixe `MiniBar-1.5.3-Windows-x64.zip` e extraia **todo** o conteúdo em uma pasta.
 3. Instale o [.NET Desktop Runtime 10 x64](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), caso ainda não esteja instalado.
 4. Execute **MiniBar.exe**. Clique com o botão direito no widget ou no ícone da bandeja para abrir as opções.
@@ -25,7 +25,7 @@ As preferências continuam em `%LocalAppData%\MeuPlayer\preferencias.json` e as 
 
 Se **Iniciar com o Windows** estava ativo, desative a opção na versão antiga e ative novamente pelo MiniBar na pasta definitiva. O MiniBar reconhece a entrada antiga; ao desativar a opção, remove as entradas antigas e novas do próprio aplicativo. Ao ativá-la, registra `MiniBar.exe`.
 
-O endereço do repositório continua sendo `Fernando-Almeida582/MeuPlayer`. O nome do produto, o executável e a identidade visual agora são **MiniBar**; as releases antigas continuam disponíveis.
+O repositório agora é `Fernando-Almeida582/MiniBar`. O nome do produto, o executável e a identidade visual agora são **MiniBar**; as releases antigas continuam disponíveis.
 
 ## Recursos
 
