@@ -18,7 +18,7 @@ internal static class OnlineLyrics
             Timeout = TimeSpan.FromSeconds(7),
             MaxResponseContentBufferSize = 1024 * 1024
         };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("MeuPlayer/1.4.11 (+https://github.com/Fernando-Almeida582/MeuPlayer)");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("MiniBar/1.5.3 (+https://github.com/Fernando-Almeida582/MeuPlayer)");
         return client;
     });
 

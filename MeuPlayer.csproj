@@ -6,9 +6,19 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
-    <Version>1.4.14</Version>
+    <Version>1.5.3</Version>
+    <AssemblyName>MiniBar</AssemblyName>
+    <Product>MiniBar</Product>
+    <Title>MiniBar</Title>
+    <Authors>Fernando Almeida</Authors>
+    <Description>Controles de mídia, letras sincronizadas e bateria dos dispositivos junto à barra de tarefas do Windows.</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources/MiniBar.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Resources/MiniBar.ico" />
+    <EmbeddedResource Include="Resources/tray-*.ico" LogicalName="MiniBar.Brand.%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>
 
 

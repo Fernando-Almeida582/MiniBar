@@ -70,12 +70,17 @@ public partial class PlayerWindow : Window
         mediaVisible = preferences.MediaVisible || !batteryVisible;
         floatingPosition = preferences.X is int x && preferences.Y is int y ? (x, y) : null;
         trayMenu = new Forms.ContextMenuStrip();
-        tray = new Forms.NotifyIcon { Icon = System.Drawing.SystemIcons.Application, Text = "Meu Player", ContextMenuStrip = trayMenu };
+        lightTray = BrandAssets.LightTaskbar;
+        trayIcon = BrandAssets.LoadTrayIcon(lightTray);
+        tray = new Forms.NotifyIcon { Icon = trayIcon, Text = "MiniBar", ContextMenuStrip = trayMenu };
+        Microsoft.Win32.SystemEvents.UserPreferenceChanged += TrayThemeChanged;
         tray.DoubleClick += (_, _) => SetFloating(!floating);
 
         Closed += (_, _) =>
         {
             closed = true;
+            CloseToolTips();
+            Microsoft.Win32.SystemEvents.UserPreferenceChanged -= TrayThemeChanged;
             layoutTimer.Stop();
             mediaTimer.Stop();
             batteryTimer.Stop();
@@ -84,6 +89,7 @@ public partial class PlayerWindow : Window
             CloseAdditionalDisplays();
             batteries.Dispose();
             tray.Dispose();
+            trayIcon?.Dispose();
             trayMenu.Dispose();
         };
         layoutTimer.Tick += (_, _) => { if (!HasOpenMenu()) { Place(); RefreshDisplays(); } };
@@ -141,7 +147,7 @@ public partial class PlayerWindow : Window
             {
                 trackTitle = "Sem mídia ativa";
                 ShowLyricLine(null);
-                Artist.Text = "Meu Player";
+                Artist.Text = "MiniBar";
                 OpenSource.ToolTip = null;
                 OpenSource.IsEnabled = false;
                 mediaSourceId = null;
@@ -329,9 +335,58 @@ public partial class PlayerWindow : Window
         Battery.Children.Clear();
         if (devices.Count == 0)
         {
-            AddBattery("\uE83F", "—", batteryUnavailable
-                ? "Leitura de bateria de dispositivos indisponível"
-                : "Aguardando um dispositivo com bateria compatível");
+            string description = batteryUnavailable
+                ? "Não foi possível consultar a bateria dos dispositivos."
+                : "Nenhum dispositivo Bluetooth ou USB compatível com leitura de bateria foi detectado.";
+            var status = new StackPanel
+            {
+                Margin = new Thickness(3, 0, 3, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = System.Windows.Media.Brushes.Transparent,
+                ToolTip = description
+            };
+            AutomationProperties.SetName(status, description);
+            var symbol = new Grid
+            {
+                Width = 26,
+                Height = 18,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+            };
+            var bluetooth = new TextBlock
+            {
+                Text = "\uE702",
+                FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
+                FontSize = 16,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            bluetooth.SetResourceReference(TextBlock.ForegroundProperty, "PlayerText");
+            var disconnected = new TextBlock
+            {
+                Text = "×",
+                FontFamily = new System.Windows.Media.FontFamily("Segoe UI"),
+                FontWeight = FontWeights.Bold,
+                FontSize = 13,
+                Foreground = System.Windows.Media.Brushes.IndianRed,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom
+            };
+            symbol.Children.Add(bluetooth);
+            symbol.Children.Add(disconnected);
+            var detail = new TextBlock
+            {
+                Text = batteryUnavailable ? "Bateria indisponível" : "Nenhum dispositivo conectado",
+                FontSize = 9,
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+            };
+            detail.SetBinding(FrameworkElement.MaxWidthProperty,
+                new System.Windows.Data.Binding(nameof(FrameworkElement.MaxWidth)) { Source = Battery });
+            detail.SetResourceReference(TextBlock.ForegroundProperty, "PlayerDetail");
+            status.Children.Add(symbol);
+            status.Children.Add(detail);
+            Battery.Children.Add(status);
             return;
         }
 
@@ -404,6 +459,7 @@ public partial class PlayerWindow : Window
             if (IsVisible)
             {
                 (controller ?? this).seekFlyout?.CloseIfTarget(OpenSource);
+                CloseToolTips();
                 Hide();
             }
             return;
@@ -447,7 +503,9 @@ public partial class PlayerWindow : Window
             Native.Move(window, x, y);
             floatingPosition = null;
         }
-
+        // Repositioning the owner can put it above its separate popup HWNDs.
+        RaiseOpenToolTips();
+        (controller ?? this).seekFlyout?.BringForward();
     }
 
     private void SetDockSide(bool right)
@@ -603,7 +661,7 @@ public partial class PlayerWindow : Window
         new("Tema", Children: PlayerTheme.All.Select((theme, index) =>
             new Option(theme.Name, preferences.Theme == index, () => ChangeOption(() => preferences.Theme = index))).ToArray()),
         new("Iniciar com o Windows", WindowsStartup.IsRegistered, ToggleStartup),
-        new("Encerrar Meu Player", Run: Close)
+        new("Encerrar MiniBar", Run: Close)
     ];
 
     private void ChangeOption(Action change)
@@ -616,7 +674,7 @@ public partial class PlayerWindow : Window
     private void ToggleStartup()
     {
         if (!WindowsStartup.Set(!WindowsStartup.IsRegistered))
-            System.Windows.MessageBox.Show("Não foi possível alterar a inicialização desta cópia.", "Meu Player",
+            System.Windows.MessageBox.Show("Não foi possível alterar a inicialização desta cópia.", "MiniBar",
                 MessageBoxButton.OK, MessageBoxImage.Information);
         BuildMenus();
     }
@@ -680,6 +738,7 @@ public partial class PlayerWindow : Window
         return item;
     }
 }
+
 
 
 

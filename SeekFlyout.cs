@@ -6,6 +6,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -61,6 +62,7 @@ internal sealed class SeekFlyout
             StaysOpen = true,
             Child = panel
         };
+        popup.Opened += (_, _) => BringForward();
 
         slider.ValueChanged += (_, _) => positionLabel.Text = FormatTime(slider.Value);
         slider.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
@@ -92,6 +94,12 @@ internal sealed class SeekFlyout
     }
 
     internal bool IsOpen => popup.IsOpen;
+
+    internal void BringForward()
+    {
+        if (popup.IsOpen && PresentationSource.FromVisual(panel) is HwndSource source)
+            Native.BringPopupForward(source.Handle);
+    }
 
     internal void Open(UIElement target, string sessionSource, string track, PlayerWindow.MediaTimeline time)
     {

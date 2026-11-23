@@ -227,6 +227,12 @@ internal static class Native
 
     internal static void KeepBehind(nint window) => SetWindowPos(window, 1, 0, 0, 0, 0, 0x13);
 
+    internal static void BringPopupForward(nint window)
+    {
+        if (window != 0 && IsWindowVisible(window))
+            SetWindowPos(window, -1, 0, 0, 0, 0, 0x13); // TOPMOST, NOSIZE, NOMOVE, NOACTIVATE
+    }
+
     internal static void PresentDockBehind(nint window, int x, int y, nint foreground)
     {
         const uint flags = 0x0001 | 0x0010 | 0x0040; // NOSIZE, NOACTIVATE, SHOWWINDOW

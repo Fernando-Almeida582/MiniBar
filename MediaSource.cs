@@ -22,6 +22,7 @@ internal static class MediaSource
     internal record Window(nint Handle, string Title);
     internal record Tab(Window Window, AutomationElement Element);
 
+
     internal static (Window[] Windows, bool Browser) FindWindows(string source)
     {
         var known = Known.FirstOrDefault(entry => MatchesId(source, entry.Id));
